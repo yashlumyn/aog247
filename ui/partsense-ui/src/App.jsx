@@ -22,7 +22,7 @@ export default function App() {
     const formData = new FormData()
     formData.append("file", file)
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/detect_anomaly`,
+    const res = await fetch(`/detect_anomaly`,
    {
       method: "POST",
       body: formData,
