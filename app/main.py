@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.api import router
+from app.admin import router as admin_router
 import os
 
 app = FastAPI(title="AOG247 API")
@@ -14,11 +15,12 @@ app.add_middleware(
         "http://192.168.1.12:5173",
     ],
     allow_credentials=False,
-    allow_methods=["POST"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
 app.include_router(router)
+app.include_router(admin_router)
 
 @app.get("/version")
 def version():
@@ -38,3 +40,4 @@ app.mount(
 @app.get("/")
 def serve_index():
     return FileResponse(os.path.join(DIST_DIR, "index.html"))
+

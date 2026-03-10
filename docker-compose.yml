@@ -1,0 +1,10 @@
+services:
+  partsense:
+    build: .
+    image: partsense:3.1.1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/derived:/app/data/derived
+      - ./artifacts:/app/artifacts
+    restart: unless-stopped

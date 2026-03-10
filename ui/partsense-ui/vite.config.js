@@ -4,4 +4,11 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/detect_anomaly': 'http://localhost:8000',
+      '/feedback': 'http://localhost:8000',
+      '/admin': 'http://localhost:8000',
+    },
+  },
 })
