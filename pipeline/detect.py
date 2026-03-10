@@ -12,7 +12,9 @@ import torch.nn.functional as F
 from pipeline.preprocess import preprocess_image
 from pipeline.backbone import FeatureExtractor
 
-MEMORY_PATH = Path("artifacts/memory_bank.pt")
+import os
+MEMORY_PATH = Path(os.getenv("MEMORY_BANK", "artifacts/memory_bank.pt"))
+
 THRESHOLD = 0.5  # TEMP, hard-coded
 
 # --- load once at startup ---

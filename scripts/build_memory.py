@@ -9,7 +9,7 @@ from pipeline.backbone import FeatureExtractor
 # ------------------------
 # Config
 # ------------------------
-IMAGE_DIR = Path("data/derived/renders_v1")
+IMAGE_DIR = Path("data/derived/renders_v2_baseline")
 OUT_DIR = Path("artifacts")
 OUT_DIR.mkdir(exist_ok=True)
 OUT_PATH = OUT_DIR / "memory_bank.pt"
@@ -50,16 +50,19 @@ def main():
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"Using device: {device}")
 
-    images = list(IMAGE_DIR.glob("*.png")) + list(IMAGE_DIR.glob("*.jpg"))
+    images = list(IMAGE_DIR.glob("*.[pP][nN][gG]")) + list(IMAGE_DIR.glob("*.[jJ][pP][gG]"))
     if len(images) == 0:
-        raise RuntimeError("No images found in data/derived/renders_v1")
+        raise RuntimeError("No images found in data/derived/renders_v2_baseline")
 
+    print(f"STAGE:MODEL_LOAD")
     model = FeatureExtractor().to(device)
     model.eval()
 
     all_patches = []
+    total = len(images)
 
-    for img_path in images:
+    for i, img_path in enumerate(images, 1):
+        print(f"STAGE:IMAGE_LOOP {i}/{total}")
         img = preprocess_image(img_path).to(device)
 
         with torch.no_grad():
@@ -70,13 +73,16 @@ def main():
 
         print(f"Processed: {img_path.name} -> patches {patches.shape}")
 
+    print(f"STAGE:CONCATENATE")
     memory = torch.cat(all_patches, dim=0)
 
+    print(f"STAGE:SUBSAMPLE")
     # Subsample (required)
     if memory.size(0) > MAX_PATCHES:
         idx = torch.randperm(memory.size(0))[:MAX_PATCHES]
         memory = memory[idx]
 
+    print(f"STAGE:SAVE")
     torch.save(
         {
             "memory": memory,
